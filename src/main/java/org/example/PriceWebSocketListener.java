@@ -1,14 +1,10 @@
 package org.example;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import okio.ByteString;
-import org.jetbrains.annotations.NotNull;
+import okhttp3.Response;
 
 public class PriceWebSocketListener extends WebSocketListener {
-
     private final CandlestickManager candlestickManager;
 
     public PriceWebSocketListener(CandlestickManager candlestickManager) {
@@ -16,22 +12,23 @@ public class PriceWebSocketListener extends WebSocketListener {
     }
 
     @Override
-    public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-        JsonObject json = JsonParser.parseString(text).getAsJsonObject();
-        double price = json.get("price").getAsDouble();
-        long timestamp = json.get("timestamp").getAsLong();
-
-        candlestickManager.processPriceUpdate(price, timestamp);
+    public void onOpen(WebSocket webSocket, Response response) {
+        System.out.println("WebSocket connection opened: " + response.message());
     }
 
     @Override
-    public void onMessage(@NotNull WebSocket webSocket, ByteString bytes) {
-        System.out.println("Received ByteString: " + bytes.hex());
+    public void onMessage(WebSocket webSocket, String text) {
+        System.out.println("Message received: " + text);
+        candlestickManager.processPriceReport(text); // Process the incoming message
     }
 
     @Override
-    public void onFailure(@NotNull WebSocket webSocket, Throwable t, okhttp3.Response response) {
-        t.printStackTrace();
+    public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+        System.out.println("WebSocket failure: " + t.getMessage());
+    }
+
+    @Override
+    public void onClosed(WebSocket webSocket, int code, String reason) {
+        System.out.println("WebSocket closed: " + reason);
     }
 }
-

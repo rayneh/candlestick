@@ -2,17 +2,31 @@ package org.example;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.WebSocket;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class WebSocketPriceFeedApp {
 
-    public static void main(String[] args) {
-        String wsUrl = "wss://your-websocket-feed-url"; // Replace with DEX's WebSocket URL
+    public void start(String[] args) {
+        if (args.length < 1) {
+            System.out.println("Usage: java WebSocketPriceFeedApp [FeedID]");
+            return;
+        }
+
+        String feedID = args[0];
+        String wsUrl = "wss://ws.testnet-dataengine.chain.link/api/v1/ws?feedIDs=" + feedID;
+
+        System.out.println("Connecting to WebSocket at: " + wsUrl);
+
         OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(wsUrl).build();
+
+        Request request = new Request.Builder()
+                .url(wsUrl)
+                .addHeader("Authorization", HmacUtils.generateHmacAuthorizationHeader(feedID))
+                .build();
+
         PriceWebSocketListener listener = new PriceWebSocketListener(new CandlestickManager());
         WebSocket ws = client.newWebSocket(request, listener);
 
@@ -27,4 +41,3 @@ public class WebSocketPriceFeedApp {
         }, 600000);
     }
 }
-
