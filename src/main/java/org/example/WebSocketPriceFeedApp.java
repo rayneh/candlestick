@@ -22,10 +22,15 @@ public class WebSocketPriceFeedApp {
 
         OkHttpClient client = new OkHttpClient();
 
-        Request request = new Request.Builder()
-                .url(wsUrl)
-                .addHeader("Authorization", HmacUtils.generateHmacAuthorizationHeader(feedID))
-                .build();
+        Request.Builder requestBuilder = new Request.Builder().url(wsUrl);
+
+        // Retrieve authorization headers
+        String[] headers = HmacUtils.generateHmacAuthorizationHeaders();
+        requestBuilder.addHeader("Authorization", headers[0]);
+        requestBuilder.addHeader("X-Authorization-Timestamp", headers[1]);
+        requestBuilder.addHeader("X-Authorization-Signature-SHA256", headers[2]);
+
+        Request request = requestBuilder.build();
 
         PriceWebSocketListener listener = new PriceWebSocketListener(new CandlestickManager());
         WebSocket ws = client.newWebSocket(request, listener);
