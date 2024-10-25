@@ -1,30 +1,28 @@
 package org.example;
 
-import java.time.Instant;
-
 public class PriceData {
-    private final double price;
-    private final Instant timestamp;
+    private final int price;
+    private final long timestamp;
 
-    private PriceData(double price, Instant timestamp) {
+    private PriceData(long timestamp, int price) {
         this.price = price;
         this.timestamp = timestamp;
     }
 
-    public double getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public Instant getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public static PriceData fromReport(String report) {
+    public static PriceData fromReport(long timestamp, int price) {
         // Parse the report to extract price and timestamp
         // This is just an example; you'll need to implement the actual parsing logic
-        double price = 0; // Extracted price
-        Instant timestamp = Instant.now(); // Example timestamp
+        //ouble price = 0; // Extracted price
+        //Instant timestamp = Instant.now(); // Example timestamp
 
-        return new PriceData(price, timestamp);
+        return new PriceData(timestamp, price);
     }
 }

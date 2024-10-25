@@ -2,12 +2,12 @@ package org.example;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import java.util.Timer;
-import java.util.TimerTask;
+
+import java.util.concurrent.CountDownLatch;
 
 public class WebSocketPriceFeedApp {
+
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     public void start(String[] args) {
         if (args.length < 1) {
@@ -18,31 +18,32 @@ public class WebSocketPriceFeedApp {
         String feedID = args[0];
         String wsUrl = "wss://ws.testnet-dataengine.chain.link/api/v1/ws?feedIDs=" + feedID;
 
-        System.out.println("Connecting to WebSocket at: " + wsUrl);
+        // Retrieve authorization headers
+        String[] headers = Hmac.generateHmacAuthorizationHeaders("/api/v1/ws?feedIDs=" + feedID);
+        String authorizationHeader = headers[0];
+        String timestampHeader = headers[1];
+        String signatureHeader = headers[2];
+
+        System.out.println("[INFO] Attempting to connect to WebSocket at: " + wsUrl);
 
         OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(wsUrl)
+                .header("Authorization", authorizationHeader)
+                .header("X-Authorization-Timestamp", timestampHeader)
+                .header("X-Authorization-Signature-SHA256", signatureHeader)
+                .header("Connection", "Upgrade")
+                .header("Upgrade", "websocket")
+                .build();
 
-        Request.Builder requestBuilder = new Request.Builder().url(wsUrl);
+        client.newWebSocket(request, new PriceWebSocketListener(latch));
+        client.dispatcher().executorService().shutdown();
 
-        // Retrieve authorization headers
-        String[] headers = HmacUtils.generateHmacAuthorizationHeaders();
-        requestBuilder.addHeader("Authorization", headers[0]);
-        requestBuilder.addHeader("X-Authorization-Timestamp", headers[1]);
-        requestBuilder.addHeader("X-Authorization-Signature-SHA256", headers[2]);
-
-        Request request = requestBuilder.build();
-
-        PriceWebSocketListener listener = new PriceWebSocketListener(new CandlestickManager());
-        WebSocket ws = client.newWebSocket(request, listener);
-
-        // Trigger shutdown after 10 minutes for demo purposes
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                ws.close(1000, "Closing connection");
-                client.dispatcher().executorService().shutdown();
-            }
-        }, 600000);
+        // Wait for WebSocket to finish before ending the program
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            System.err.println("[ERROR] WebSocket connection interrupted: " + e.getMessage());
+        }
     }
 }
