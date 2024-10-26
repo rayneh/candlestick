@@ -7,16 +7,20 @@ import java.security.MessageDigest;
 import java.util.Formatter;
 
 public class Hmac {
-    private static final String SHARED_SECRET = "";
+    private static String UUID = "";
+    private static String SHARED_SECRET = "";
 
-    public static String[] generateHmacAuthorizationHeaders(String path) {
+    public Hmac(String uuid, String secret) {
+        UUID = uuid;
+        SHARED_SECRET = secret;
+    }
 
-        String userId = "<UUID>";
+    public String[] generateHmacAuthorizationHeaders(String path) {
         long timestamp = System.currentTimeMillis();
-        String signature = generateHmacSignature(userId, path, timestamp);
+        String signature = generateHmacSignature(UUID, path, timestamp);
 
         return new String[]{
-                userId,                // Authorization header
+                UUID,                // Authorization header
                 String.valueOf(timestamp), // X-Authorization-Timestamp
                 signature              // X-Authorization-Signature-SHA256
         };
