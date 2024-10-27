@@ -4,13 +4,13 @@ This project demonstrates how to ingest price reports via WebSocket and convert 
 
 ## Features
 
-- Connects to a WebSocket for real-time price updates
+- Connects to a Chainlink Data Streams WebSocket for real-time price updates
 - Processes price updates and stores them in Open High Low Close (OHLC) format
-- Supports multiple timeframes: 1m, 2m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 1w
+- Supports timeframe: 1m
 
 ## Prerequisites
 
-- Java 11 or higher
+- Java 21 or higher
 - Maven
 
 ## Getting Started
@@ -29,10 +29,17 @@ This project demonstrates how to ingest price reports via WebSocket and convert 
 
 4. Run the application:
     ```bash
-    mvn exec:java -Dexec.mainClass="org.example.Main"
+    mvn exec:java -Dexec.mainClass="org.example.Main <FEED_ID> <UUID> <SECRET>"
    
 ## Usage
 Once the application is running, it will listen for price updates and process them into candlestick data.
 
+## TODO:
+* Implement bulk feeds.
+* Implement v1 and v2 streams.
+* Read complete fullReport, currently only reading benchmarkPrice for v3 streams.
+* Implement timeframes: 2m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1day, 1week
+
 ## License
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) see the LICENSE file for details.
+
