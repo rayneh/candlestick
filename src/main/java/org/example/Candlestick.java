@@ -1,14 +1,16 @@
 package org.example;
 
+import java.math.BigDecimal;
+
 public class Candlestick {
-    private final double open;
-    private double high;
-    private double low;
-    private double close;
+    private final BigDecimal open;
+    private BigDecimal high;
+    private BigDecimal low;
+    private BigDecimal close;
     private final long openTime;
     private long closeTime;
 
-    public Candlestick(double open, double high, double low, double close, long openTime, long closeTime) {
+    public Candlestick(BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, long openTime, long closeTime) {
         this.open = open;
         this.high = high;
         this.low = low;
@@ -17,28 +19,28 @@ public class Candlestick {
         this.closeTime = closeTime;
     }
 
-    public void update(double price, long timestamp) { //TODO: mb move logic out of manager
+    public void update(BigDecimal price, long timestamp) {
         this.close = price;
         this.closeTime = timestamp;
-        if (price > high) high = price;
-        if (price < low) low = price;
+        if (price.compareTo(high) > 0) high = price;
+        if (price.compareTo(low) < 0) low = price;
     }
 
     public String toOutputFormat() {
         return String.format("[\n" +
                         "  %d,            // Open time\n" +
-                        "  \"%.2f\",      // Open\n" +
-                        "  \"%.2f\",      // High\n" +
-                        "  \"%.2f\",      // Low\n" +
-                        "  \"%.2f\",      // Close\n" +
+                        "  \"%s\",      // Open\n" +
+                        "  \"%s\",      // High\n" +
+                        "  \"%s\",      // Low\n" +
+                        "  \"%s\",      // Close\n" +
                         "  %d,           // Close time\n" +
                         "  \"0\"         // Ignore.\n" +
                         "]",
                 openTime,
-                open,
-                high,
-                low,
-                close,
+                open.toPlainString(),
+                high.toPlainString(),
+                low.toPlainString(),
+                close.toPlainString(),
                 closeTime
         );
     }

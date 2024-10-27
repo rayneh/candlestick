@@ -18,7 +18,7 @@ public class WebSocketPriceFeedApp {
         String feedID = args[0];
         String wsUrl = "wss://ws.testnet-dataengine.chain.link/api/v1/ws?feedIDs=" + feedID;
 
-        Hmac hmac = new Hmac(args[1], args[2]);
+        HMac hmac = new HMac(args[1], args[2]);
         // Retrieve authorization headers
         String[] headers = hmac.generateHmacAuthorizationHeaders("/api/v1/ws?feedIDs=" + feedID);
         String authorizationHeader = headers[0];

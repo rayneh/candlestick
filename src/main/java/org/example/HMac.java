@@ -6,11 +6,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Formatter;
 
-public class Hmac {
+public class HMac {
     private static String UUID = "";
     private static String SHARED_SECRET = "";
 
-    public Hmac(String uuid, String secret) {
+    public HMac(String uuid, String secret) {
         UUID = uuid;
         SHARED_SECRET = secret;
     }
